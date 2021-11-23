@@ -1,4 +1,10 @@
+import * as React from 'react'
+
 export default function JokesIndexRoute() {
+  React.useEffect(() => {
+    document.write('<h1>Jokes Index</h1>')
+  }, [])
+
   return (
     <div>
       <p>Here's a random joke:</p>

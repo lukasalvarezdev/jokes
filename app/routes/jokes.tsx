@@ -1,26 +1,44 @@
-import * as React from 'react'
-import { Outlet } from 'remix'
+import type { LinksFunction } from 'remix'
+import { Outlet, Link } from 'remix'
 
-// This is a parent route.
+export const links: LinksFunction = () => {
+  return []
+}
+
 export default function JokesRoute() {
-  const pepe = 'Hola'
-
-  React.useEffect(() => {
-    console.log('First render')
-  }, [])
-
   return (
-    <div>
-      <jokesContext.Provider
-        value={{
-          pepe,
-        }}
-      >
-        <h1>J🤪KES</h1>
-        <Outlet />
-      </jokesContext.Provider>
+    <div className="jokes-layout">
+      <header className="jokes-header">
+        <div className="container">
+          <h1 className="home-link">
+            <Link to="/" title="Remix Jokes" aria-label="Remix Jokes">
+              <span className="logo">🤪</span>
+              <span className="logo-medium">J🤪KES</span>
+            </Link>
+          </h1>
+        </div>
+      </header>
+      <main className="jokes-main">
+        <div className="container">
+          <div className="jokes-list">
+            <Link to=".">Get a random joke</Link>
+            <p>Here are a few more jokes to check out:</p>
+            <ul>
+              <li>
+                <Link to="some-joke-id" prefetch="intent">
+                  Hippo
+                </Link>
+              </li>
+            </ul>
+            <Link to="new" className="button">
+              Add your own
+            </Link>
+          </div>
+          <div className="jokes-outlet">
+            <Outlet />
+          </div>
+        </div>
+      </main>
     </div>
   )
 }
-
-export const jokesContext = React.createContext<{ pepe: string }>({} as any)
