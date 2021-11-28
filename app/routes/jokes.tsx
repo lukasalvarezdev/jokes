@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { Joke } from '.prisma/client'
 import { LoaderFunction, useLoaderData } from 'remix'
 import { Outlet, Link } from 'remix'
@@ -47,10 +48,27 @@ export default function JokesRoute() {
             </Link>
           </div>
           <div className="jokes-outlet">
-            <Outlet />
+            <jokesContext.Provider
+              value={{
+                jokes,
+              }}
+            >
+              <Outlet />
+            </jokesContext.Provider>
           </div>
         </div>
       </main>
     </div>
   )
+}
+
+interface JokesContextProps {
+  jokes: LoaderData
+}
+
+const jokesContext = React.createContext<JokesContextProps>({} as JokesContextProps)
+
+export function useJokes() {
+  const ctx = React.useContext(jokesContext)
+  return ctx
 }
