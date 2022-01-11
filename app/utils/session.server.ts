@@ -74,7 +74,11 @@ export async function justProtectRoute(request: Request) {
 export async function getUser(request: Request) {
   const userId = await getUserId(request)
   if (!userId) return null
-  return db.user.findUnique({ where: { id: userId } })
+  try {
+    return await db.user.findUnique({ where: { id: userId } })
+  } catch (error) {
+    throw logout(request)
+  }
 }
 
 export async function logout(request: Request) {

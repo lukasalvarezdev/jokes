@@ -33,7 +33,7 @@ export const loader: LoaderFunctionType<LoaderData> = async ({ request }) => {
 }
 
 export default function JokesRoute() {
-  const { jokes } = useLoaderData<LoaderData>()
+  const { jokes, user } = useLoaderData<LoaderData>()
 
   return (
     <div className="jokes-layout">
@@ -45,6 +45,18 @@ export default function JokesRoute() {
               <span className="logo-medium">J🤪KES</span>
             </Link>
           </h1>
+          {user ? (
+            <div className="user-info">
+              <span>{`Hi ${user.username}`}</span>
+              <form action="/logout" method="post">
+                <button type="submit" className="button">
+                  Logout
+                </button>
+              </form>
+            </div>
+          ) : (
+            <Link to="/login">Login</Link>
+          )}
         </div>
       </header>
       <main className="jokes-main">
