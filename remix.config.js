@@ -3,8 +3,8 @@
  */
 module.exports = {
   appDirectory: 'app',
-  assetsBuildDirectory: 'public/build',
+  browserBuildDirectory: 'public/build',
   publicPath: '/build/',
-  serverBuildDirectory: 'api/_build',
-  ignoredRouteFiles: ['.*'],
+  serverBuildDirectory: 'build',
+  devServerPort: 8002,
 }

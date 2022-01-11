@@ -1,8 +1,18 @@
 import * as React from 'react'
-import { Joke } from '.prisma/client'
-import { LoaderFunction, useLoaderData } from 'remix'
-import { Outlet, Link } from 'remix'
+import { useLoaderData, Outlet, Link } from 'remix'
+import type { LinksFunction, LoaderFunction } from 'remix'
+import type { Joke } from '.prisma/client'
 import { db } from '~/utils/db.server'
+import stylesUrl from '../styles/jokes.css'
+
+export const links: LinksFunction = () => {
+  return [
+    {
+      rel: 'stylesheet',
+      href: stylesUrl,
+    },
+  ]
+}
 
 type LoaderData = Pick<Joke, 'id' | 'name'>[]
 
