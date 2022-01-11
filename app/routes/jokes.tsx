@@ -1,9 +1,11 @@
 import * as React from 'react'
 import { useLoaderData, Outlet, Link } from 'remix'
-import type { LinksFunction, LoaderFunction } from 'remix'
-import type { Joke } from '.prisma/client'
+import type { LinksFunction } from 'remix'
+import type { Joke, User } from '.prisma/client'
 import { db } from '~/utils/db.server'
 import stylesUrl from '../styles/jokes.css'
+import { getUser } from '~/utils/session.server'
+import type { LoaderFunctionType } from '~/utils/types'
 
 export const links: LinksFunction = () => {
   return [
@@ -14,20 +16,24 @@ export const links: LinksFunction = () => {
   ]
 }
 
-type LoaderData = Pick<Joke, 'id' | 'name'>[]
+interface LoaderData {
+  jokes: Array<Pick<Joke, 'id' | 'name'>>
+  user: User | null
+}
 
-export const loader: LoaderFunction = async () => {
+export const loader: LoaderFunctionType<LoaderData> = async ({ request }) => {
+  const user = await getUser(request)
   const jokes = await db.joke.findMany({
     take: 5,
     select: { id: true, name: true },
     orderBy: { createdAt: 'desc' },
   })
 
-  return jokes
+  return { jokes, user }
 }
 
 export default function JokesRoute() {
-  const jokes = useLoaderData<LoaderData>()
+  const { jokes } = useLoaderData<LoaderData>()
 
   return (
     <div className="jokes-layout">
@@ -73,7 +79,7 @@ export default function JokesRoute() {
 }
 
 interface JokesContextProps {
-  jokes: LoaderData
+  jokes: LoaderData['jokes']
 }
 
 const jokesContext = React.createContext<JokesContextProps>({} as JokesContextProps)
