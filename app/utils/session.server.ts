@@ -41,3 +41,48 @@ export async function createUserSession(userId: string, redirectTo: string) {
     },
   })
 }
+
+function getUserSession(request: Request) {
+  return storage.getSession(request.headers.get('Cookie'))
+}
+
+export async function getUserId(request: Request) {
+  const session = await getUserSession(request)
+  const userId = session.get('userId')
+  if (typeof userId !== 'string') return null
+  return userId
+}
+
+export async function requireUserId(
+  request: Request,
+  redirectTo = new URL(request.url).pathname,
+) {
+  const userId = await getUserId(request)
+  if (!userId) {
+    const params = new URLSearchParams({ redirectTo })
+    throw redirect(`/login?${params}`)
+  }
+
+  return userId
+}
+
+export async function justProtectRoute(request: Request) {
+  await requireUserId(request)
+  return {}
+}
+
+export async function getUser(request: Request) {
+  const userId = await getUserId(request)
+  if (!userId) return null
+  return db.user.findUnique({ where: { id: userId } })
+}
+
+export async function logout(request: Request) {
+  const session = await getUserSession(request)
+
+  return redirect('/', {
+    headers: {
+      'Set-Cookie': await storage.destroySession(session),
+    },
+  })
+}

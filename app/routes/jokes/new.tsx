@@ -1,6 +1,7 @@
-import { ActionFunction, useActionData } from 'remix'
+import { ActionFunction, LoaderFunction, useActionData } from 'remix'
 import { redirect } from 'remix'
 import { db } from '~/utils/db.server'
+import { justProtectRoute, requireUserId } from '~/utils/session.server'
 
 function validateName(name: string) {
   if (!name) {
@@ -20,6 +21,8 @@ function validateContent(content: string) {
   }
 }
 
+export const loader: LoaderFunction = async ({ request }) => await justProtectRoute(request)
+
 interface ActionData {
   formError?: string
   fieldErrors?: { name?: string; content?: string }
@@ -27,6 +30,7 @@ interface ActionData {
 }
 
 export const action: ActionFunction = async ({ request }): Promise<Response | ActionData> => {
+  const userId = await requireUserId(request, '/jokes/new')
   const form = await request.formData()
   const name = form.get('name')
   const content = form.get('content')
@@ -45,7 +49,7 @@ export const action: ActionFunction = async ({ request }): Promise<Response | Ac
   }
 
   const joke = await db.joke.create({
-    data: { name, content },
+    data: { name, content, jokesterId: userId },
   })
 
   return redirect(`/jokes/${joke.id}`)
