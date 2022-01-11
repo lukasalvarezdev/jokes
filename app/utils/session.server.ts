@@ -7,6 +7,14 @@ interface LoginType {
   password: string
 }
 
+export async function register({ username, password }: LoginType) {
+  const passwordHash = await bcrypt.hash(password, 10)
+  const user = await db.user.create({
+    data: { username, passwordHash },
+  })
+  return user
+}
+
 export async function login({ username, password }: LoginType) {
   const user = await db.user.findFirst({ where: { username } })
   if (!user) return null
