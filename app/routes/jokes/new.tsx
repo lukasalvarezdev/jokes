@@ -1,7 +1,7 @@
-import { ActionFunction, LoaderFunction, useActionData } from 'remix'
-import { redirect } from 'remix'
+import type { ActionFunction, LoaderFunction } from 'remix'
+import { redirect, useActionData, useCatch, useLocation, Link } from 'remix'
 import { db } from '~/utils/db.server'
-import { justProtectRoute, requireUserId } from '~/utils/session.server'
+import { getUserId, requireUserId } from '~/utils/session.server'
 
 function validateName(name: string) {
   if (!name) {
@@ -21,7 +21,14 @@ function validateContent(content: string) {
   }
 }
 
-export const loader: LoaderFunction = async ({ request }) => await justProtectRoute(request)
+export const loader: LoaderFunction = async ({ request }) => {
+  const userId = await getUserId(request)
+
+  if (!userId) {
+    throw new Response('You must be logged in to create a joke', { status: 401 })
+  }
+  return {}
+}
 
 interface ActionData {
   formError?: string
@@ -103,6 +110,22 @@ export default function NewJokeRoute() {
       </form>
     </div>
   )
+}
+
+export function CatchBoundary() {
+  const { status } = useCatch()
+  const { pathname } = useLocation()
+
+  if (status === 401) {
+    return (
+      <div className="error-container">
+        <p> You must login to create a joke</p>
+        <Link to={`/login?redirectTo=${pathname}`}>Go to login</Link>
+      </div>
+    )
+  }
+
+  return null
 }
 
 export function ErrorBoundary() {

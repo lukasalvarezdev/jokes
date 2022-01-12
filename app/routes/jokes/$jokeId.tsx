@@ -1,4 +1,4 @@
-import { useLoaderData, useParams } from 'remix'
+import { useLoaderData, useParams, Link, useCatch } from 'remix'
 import type { LoaderFunction } from 'remix'
 import { Joke } from '.prisma/client'
 import { db } from '~/utils/db.server'
@@ -11,7 +11,7 @@ export const loader: LoaderFunction = async ({ params }) => {
     select: { content: true, name: true },
   })
 
-  if (!joke) throw new Error('Joke not found')
+  if (!joke) throw new Response('Joke not found', { status: 404 })
   return joke
 }
 
@@ -25,6 +25,21 @@ export default function JokeRoute() {
       <p>{joke.content}</p>
     </div>
   )
+}
+
+export function CatchBoundary() {
+  const { status } = useCatch()
+
+  if (status === 404) {
+    return (
+      <div className="error-container">
+        <p>Joke not found</p>
+        <Link to="/jokes">Go to all the jokes</Link>
+      </div>
+    )
+  }
+
+  return null
 }
 
 export function ErrorBoundary() {

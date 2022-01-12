@@ -1,5 +1,5 @@
 import type { LinksFunction } from 'remix'
-import { Links, LiveReload, Outlet, Meta } from 'remix'
+import { Links, LiveReload, Outlet, Meta, useCatch, useLocation, Link } from 'remix'
 import globalStylesUrl from './styles/global.css'
 import globalMediumStylesUrl from './styles/global-medium.css'
 import globalLargeStylesUrl from './styles/global-large.css'
@@ -47,6 +47,24 @@ export default function App({ title }: { title?: string }) {
       <Outlet />
     </Document>
   )
+}
+
+export function CatchBoundary() {
+  const { status } = useCatch()
+  const { pathname } = useLocation()
+
+  if (status === 401) {
+    return (
+      <Document title="You must login">
+        <div className="error-container">
+          <p> You must login to be here.</p>
+          <Link to={`/login?redirectTo=${pathname}`}>Go to login</Link>
+        </div>
+      </Document>
+    )
+  }
+
+  return null
 }
 
 export function ErrorBoundary({ error }: { error: Error }) {
