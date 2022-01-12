@@ -23,7 +23,7 @@ export const links: LinksFunction = () => {
   ]
 }
 
-export default function App({ title }: { title?: string }) {
+const Document: React.FC<{ title?: string }> = ({ children, title }) => {
   return (
     <html lang="en">
       <head>
@@ -33,8 +33,29 @@ export default function App({ title }: { title?: string }) {
         <Meta />
         <Links />
       </head>
-      <Outlet />
-      <body>{process.env.NODE_ENV === 'development' && <LiveReload />}</body>
+      <body>
+        {process.env.NODE_ENV === 'development' && <LiveReload />}
+        {children}
+      </body>
     </html>
+  )
+}
+
+export default function App({ title }: { title?: string }) {
+  return (
+    <Document title={title}>
+      <Outlet />
+    </Document>
+  )
+}
+
+export function ErrorBoundary({ error }: { error: Error }) {
+  return (
+    <Document title="Something went wrong">
+      <div className="error-container">
+        <h2>Something went wrong</h2>
+        <p>{error.message}</p>
+      </div>
+    </Document>
   )
 }
