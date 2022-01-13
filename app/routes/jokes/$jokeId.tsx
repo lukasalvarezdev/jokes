@@ -2,10 +2,16 @@ import { useLoaderData, useParams, Link, useCatch, redirect } from 'remix'
 import type { ActionFunction } from 'remix'
 import { Joke } from '.prisma/client'
 import { db } from '~/utils/db.server'
-import type { LoaderFunctionType } from '~/utils/types'
+import type { LoaderFunctionType, MetaFunctionType } from '~/utils/types'
 import { getUserId, requireUserId } from '~/utils/session.server'
 
 type LoaderData = { joke: Pick<Joke, 'name' | 'content' | 'jokesterId'>; canDelete: boolean }
+
+export const meta: MetaFunctionType<LoaderData> = ({ data }) => {
+  if (!data) return { title: 'Something went wrong', description: 'Something went wrong' }
+
+  return { title: `${data.joke.name} - Jokes App`, description: data.joke.content }
+}
 
 export const loader: LoaderFunctionType<LoaderData> = async ({ params, request }) => {
   const joke = await db.joke.findUnique({

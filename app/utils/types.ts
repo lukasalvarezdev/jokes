@@ -1,4 +1,4 @@
-import type { AppLoadContext } from 'remix'
+import type { AppLoadContext, HtmlMetaDescriptor } from 'remix'
 import type { Params } from 'react-router'
 
 interface DataFunctionArgs {
@@ -8,3 +8,4 @@ interface DataFunctionArgs {
 }
 
 export type LoaderFunctionType<Data> = (args: DataFunctionArgs) => Promise<Data>
+export type MetaFunctionType<Data> = ({ data }: { data: Data }) => HtmlMetaDescriptor
